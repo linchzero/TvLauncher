@@ -1,38 +1,30 @@
-name: Build Android APK
+name: Build TvLauncher APK
 
 on: [workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # 使用更稳定的Ubuntu版本
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up JDK 17
+    - uses: actions/checkout@v4
+    
+    - name: Setup Java
       uses: actions/setup-java@v4
       with:
-        java-version: 17
-        distribution: 'zulu'  # 使用Zulu JDK，兼容性更好
+        java-version: '17'
+        distribution: 'temurin'
         
-    - name: Setup Android SDK
-      uses: maurossi/setup-android-sdk@v1.2.1
-      with:
-        api-level: 31
-        build-tools-version: 31.0.0
-        cmake-version: 3.18.1
-        ndk-version: 21.4.7075529
-        additional-components: "platform-tools"
-        
-    - name: Build APK
+    - name: Setup Android SDK using custom action
+      uses: android-actions/setup-android@v2.1.0  # 使用更新的版本
+      
+    - name: Build with Gradle
       run: |
-        chmod +x gradlew
-        ./gradlew assembleDebug --stacktrace
+        chmod +x ./gradlew
+        ./gradlew assembleDebug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: App-Debug
+        name: TvLauncher-App
         path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 7
